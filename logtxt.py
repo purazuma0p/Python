@@ -1,4 +1,4 @@
-text = input("入力してください: ")
+text = input("[＊]input:>")
 def main():
     try:
         with open("output.txt", "w", encoding="utf-8") as f:
@@ -8,4 +8,5 @@ def main():
     return "Data written to output.txt"
 
 if __name__ == "__main__":
+
     main()
