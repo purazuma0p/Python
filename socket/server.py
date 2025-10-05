@@ -1,34 +1,31 @@
 import socket
-import threading
+#socket()→bind(now)→listen()→accept()→recv()→send()→close()
+# サーバーのIPアドレスとポート番号
+#サーバーのIPアドレスはこのプログラムをどうさせるマシンのIPアドレスになる
+HOST = ''  # 空文字列で全てのインターフェースで待ち受け
+PORT = 8000
 
-HOST = '127.0.0.1'
-PORT = 65432
+# 1. ソケット作成
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+# 2. バインド（IPとポートを割り当て）
+sock.bind((HOST, PORT))
 
-def handle_client(conn, addr):
-    """接続ごとに呼ばれるハンドラ。受け取ったデータをそのまま返す（エコー）。"""
-    with conn:
-        print(f'Connected by {addr}')
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            # エコー応答
-            conn.sendall(data)
+# 3. リッスン（接続待ち状態にする）
+sock.listen(1)
+print(f'ポート{PORT}で接続待ち...')
 
+# 4. アクセプト（クライアントからの接続を受け入れる）
+conn, addr = sock.accept()
+print(f'接続：{addr}')
 
-def serve(host: str = HOST, port: int = PORT):
-    """シンプルなブロッキング TCP サーバ。新しい接続はスレッドで処理する。"""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind((host, port))
-        s.listen()
-        print(f'Server listening on {host}:{port}')
-        while True:
-            conn, addr = s.accept()
-            t = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
-            t.start()
+# 5. データ受信
+data = conn.recv(1024)
+print(f'受信データ: {data.decode()}')
 
+# 6. データ送信（例として「Hello, client!」を返す）
+conn.sendall(b'Hello, client!')
 
-if __name__ == '__main__':
-    serve()
+# 7. コネクションとソケットをクローズ
+conn.close()
+sock.close()
